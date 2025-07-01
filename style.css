@@ -1,5 +1,5 @@
 
-	#canvas-background {
+#canvas-background {
 	background-color: #f4f4f4;
 	position: absolute;
 	left: 0px;
@@ -47,3 +47,4 @@
 	text-align: center;
 	width: 250px;
 }
+
