@@ -1,0 +1,48 @@
+#canvas-background {
+	background-color: #f4f4f4;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	z-index: 1;
+}
+
+#canvas-demo {
+	background-color: transparent;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	z-index: 10;
+}
+
+#points {
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	z-index: 20;
+	font-size: 25px;
+	width: 50px;
+	text-align: right;
+	border: 1px solid #999999;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#info {
+	position: absolute;
+	left: 530px;
+	top: 20px;
+	z-index: 20;
+	font-size: 20px;
+	text-align: center;
+	width: 250px;
+}
+
+#help {
+	position: absolute;
+	left: 530px;
+	top: 550px;
+	z-index: 20;
+	font-size: 15px;
+	text-align: center;
+	width: 250px;
+}
