@@ -28,10 +28,8 @@ function createArray(width, height) {
 	var arr = new Array(width);
 	for (var i = 0; i < width; i++) {
 		arr[i] = new Array(height);
-		for (var j = 0; j < height; j++) {
-			arr[i][j] = 0;
-		}
 	}
+
 	return arr;
 }
 
@@ -44,7 +42,6 @@ function init() {
 	grow = 0;
 	playing = false;
 	pressed = false;
-	gameover = false;
 
 	matrix = createArray(WIDTH, HEIGHT);
 	snake = new Array(4);
@@ -56,8 +53,7 @@ function init() {
 
 	putSnake();
 	putFruit();
-	drawBackground();
-	draw();
+	//matrix[Math.floor(WIDTH / 2)][Math.floor(HEIGHT / 2) - 5] = 3;
 }
 
 function putFruit() {
@@ -66,16 +62,16 @@ function putFruit() {
 
 	while (matrix[posX][posY]) {
 		posX = (posX + 1) % WIDTH;
-		if (posX === 0) {
+		if (posX == WIDTH) {
+			posX = posX % WIDTH;
 			posY = (posY + 1) % HEIGHT;
 		}
 
-		if (oPosX === posX && oPosY === posY) {
+		if (oPosX == posX && oPosY == posY) {
 			clearInterval(gameLoop);
 			playing = false;
 			document.getElementById("info").innerHTML =
 				"Awesome!!!<br> You finish the game!!!";
-			return;
 		}
 	}
 
@@ -94,36 +90,40 @@ function putSnake(last) {
 		clearInterval(gameLoop);
 		playing = false;
 		gameover = true;
-		return;
-	} 
-
-	if (matrix[snake[0][0]][snake[0][1]] === 2) {
-		document.getElementById("info").innerHTML =
-			'Game Over <br> You eat your own body <br> Press "space" to restart';
-		clearInterval(gameLoop);
-		playing = false;
-		gameover = true;
-		return;
-	}
-
-	if (matrix[snake[0][0]][snake[0][1]] === 3) {
-		grow += 2;
-		putFruit();
-		points++;
-		document.getElementById("points").innerHTML = points;
-	}
-
-	matrix[snake[0][0]][snake[0][1]] = 1;
-	for (var i = 1; i < snake.length; i++) {
-		matrix[snake[i][0]][snake[i][1]] = 2;
-	}
-
-	if (last) {
-		if (!grow) {
-			matrix[last[0]][last[1]] = 0;
+	} else {
+		if (matrix[snake[0][0]][snake[0][1]] == 2) {
+			document.getElementById("info").innerHTML =
+				'Game Over <br> You eat your own body <br> Press "space" to restart';
+			clearInterval(gameLoop);
+			playing = false;
+			gameover = true;
 		} else {
-			snake.push([last[0], last[1]]);
-			grow--;
+			if (matrix[snake[0][0]][snake[0][1]] == 3) {
+				// eat a fruit
+				grow += 2;
+				putFruit();
+				points += 1;
+				if (speed < 50) {
+					speed++;
+					clearInterval(gameLoop);
+					gameLoop = setInterval(update, 10000 / speed);
+				}
+
+				document.getElementById("points").innerHTML = points;
+			}
+
+			matrix[snake[0][0]][snake[0][1]] = 1;
+			for (var i = 1; i < snake.length; i++) {
+				matrix[snake[i][0]][snake[i][1]] = 2;
+			}
+			if (last) {
+				if (!grow) {
+					matrix[last[0]][last[1]] = 0;
+				} else {
+					snake.push([last[0], last[1]]);
+					grow--;
+				}
+			}
 		}
 	}
 }
@@ -134,8 +134,8 @@ function moveSnake() {
 		snake[i][0] = snake[i - 1][0];
 		snake[i][1] = snake[i - 1][1];
 	}
-	snake[0][0] += movX;
-	snake[0][1] += movY;
+	snake[0][0] = snake[0][0] + movX;
+	snake[0][1] = snake[0][1] + movY;
 	return last;
 }
 
@@ -146,7 +146,9 @@ function update() {
 	pressed = false;
 }
 
-var colorBG = new obelisk.SideColor().getByInnerColor(obelisk.ColorPattern.GRAY);
+var colorBG = new obelisk.SideColor().getByInnerColor(
+	obelisk.ColorPattern.GRAY
+);
 
 function drawBackground() {
 	pVBackground.clear();
@@ -161,11 +163,11 @@ function drawBackground() {
 		pVBackground.renderObject(sideY0, p3dY0);
 
 		var sideY1 = new obelisk.SideY(dimension, colorBG);
-		var p3dY1 = new obelisk.Point3D(0, i * SIZE, 0);
+		var p3dY1 = new obelisk.Point3D(0 * SIZE, i * SIZE, 0);
 		pVBackground.renderObject(sideY1, p3dY1);
 
 		var sideX1 = new obelisk.SideX(dimension, colorBG);
-		var p3dX1 = new obelisk.Point3D(SIZE * i, 0, 0);
+		var p3dX1 = new obelisk.Point3D(SIZE * i, 0 * SIZE, 0);
 		pVBackground.renderObject(sideX1, p3dX1);
 	}
 
@@ -178,13 +180,19 @@ function drawBackground() {
 	}
 }
 
-var colorBlue = new obelisk.CubeColor().getByHorizontalColor(obelisk.ColorPattern.BLUE);
+var colorBlue = new obelisk.CubeColor().getByHorizontalColor(
+	obelisk.ColorPattern.BLUE
+);
 var cubeBlue = new obelisk.Cube(dimension, colorBlue);
 
-var colorGreen = new obelisk.CubeColor().getByHorizontalColor(obelisk.ColorPattern.GRASS_GREEN);
+var colorGreen = new obelisk.CubeColor().getByHorizontalColor(
+	obelisk.ColorPattern.GRASS_GREEN
+);
 var cubeGreen = new obelisk.Cube(dimension, colorGreen);
 
-var colorRed = new obelisk.PyramidColor().getByRightColor(obelisk.ColorPattern.WINE_RED);
+var colorRed = new obelisk.PyramidColor().getByRightColor(
+	obelisk.ColorPattern.WINE_RED
+);
 var pyramidRed = new obelisk.Pyramid(dimension, colorRed);
 
 function draw() {
@@ -194,13 +202,21 @@ function draw() {
 		for (var j = 0; j < HEIGHT; j++) {
 			switch (matrix[i][j]) {
 				case 1:
-					pixelView.renderObject(cubeBlue, new obelisk.Point3D(i * SIZE, j * SIZE, 0));
+					// draw head snake
+					var p3d = new obelisk.Point3D(i * SIZE, j * SIZE, 0);
+					pixelView.renderObject(cubeBlue, p3d);
 					break;
 				case 2:
-					pixelView.renderObject(cubeGreen, new obelisk.Point3D(i * SIZE, j * SIZE, 0));
+					// draw body snake
+					var p3d = new obelisk.Point3D(i * SIZE, j * SIZE, 0);
+					pixelView.renderObject(cubeGreen, p3d);
 					break;
 				case 3:
-					pixelView.renderObject(pyramidRed, new obelisk.Point3D(i * SIZE, j * SIZE, 0));
+					// draw apple
+					var p3d = new obelisk.Point3D(i * SIZE, j * SIZE, 0);
+					pixelView.renderObject(pyramidRed, p3d);
+					break;
+				default:
 					break;
 			}
 		}
@@ -215,4 +231,44 @@ function onkeydown(e) {
 	if (playing) {
 		if (!pressed) {
 			switch (e.keyCode) {
-				case KEY.LEFT
+				case KEY.LEFT:
+					pressed = true;
+					if (movY) {
+						movX = movY;
+						movY = 0;
+					} else {
+						movY = -movX;
+						movX = 0;
+					}
+					break;
+				case KEY.RIGHT:
+					pressed = true;
+					if (movY) {
+						movX = -movY;
+						movY = 0;
+					} else {
+						movY = movX;
+						movX = 0;
+					}
+					break;
+			}
+		}
+	} else {
+		if (e.keyCode == KEY.SPACE) {
+			if (gameover && e.keyCode == KEY.SPACE) {
+				init();
+				draw();
+			}
+			playing = true;
+			pressed = true;
+			gameLoop = setInterval(update, 10000 / speed);
+			document.getElementById("info").innerHTML = "Eat all the fruit that you can";
+		}
+	}
+}
+
+document.addEventListener("keydown", onkeydown, false);
+
+init();
+drawBackground();
+draw();
